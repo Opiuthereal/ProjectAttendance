@@ -13,8 +13,7 @@ public class UserChecker {
 
         if (userExists(name, password)){
             this.id = this.getFirstId(name, password);
-            System.out.println("User exists" + this.id);
-            System.out.println("User created succesfully");
+            System.out.println(this.id);
         }
 
         else{
@@ -31,6 +30,7 @@ public class UserChecker {
         String query = "SELECT * FROM t_emp WHERE name = '" + name + "' AND code = '" + password + "'";
         ResultSet rs = statement.executeQuery(query);
         if (rs.next()) {
+            System.out.println("User exists");
             return true;
         }
         return false;
@@ -40,9 +40,8 @@ public class UserChecker {
         Statement statement = connection.createStatement();
         String query = "SELECT id FROM t_emp WHERE name = '" + name + "' AND code = '" + password + "'";
         ResultSet rs = statement.executeQuery(query);
-        if (rs.next()) {
-            int id = rs.getInt("id");
-        }
+        rs.next();
+        int id = rs.getInt(1);
         System.out.println("First id is " + id);
         return id;
     }
@@ -51,11 +50,29 @@ public class UserChecker {
         return this.id;
     }
 
-    public void Attendance (LocalDateTime formattedDateTime) throws SQLException {
+    public void Attendance (String formattedDateTime) throws SQLException {
         Statement statement = connection.createStatement();
-        String query = "INSERT INTO t_lock_in_record (id, check_in_time) VALUES (" + id + "," + formattedDateTime + ") ";
+        String query = "INSERT INTO t_lock_in_record (id, check_in_time) VALUES (" + id + ",'" + formattedDateTime + "') ";
         System.out.println("Test insertion date");
-        // remplir avec le query pour la connection ////////////////////////////////////////////////////////////////////////////
         statement.executeUpdate(query);
+    }
+
+    public void ResultSetToString(ResultSet rs) throws SQLException {
+        System.out.println("ResultSet: ");
+
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+
+        for (int i = 1; i <= columnCount; i++) {
+            System.out.print(metaData.getColumnName(i) + "\t");
+        }
+        System.out.println();
+
+        while (rs.next()) {
+            for (int i = 1; i <= columnCount; i++) {
+                System.out.print(rs.getString(i) + "\t");
+            }
+            System.out.println();
+        }
     }
 }

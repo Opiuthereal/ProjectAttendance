@@ -7,6 +7,22 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class GUI {
+    public static void adminWindow(JFrame window){
+        window.getContentPane().removeAll();
+        window.setBounds(200, 200, 800, 400);
+
+        JTextArea textArea = new JTextArea(20, 30);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setBounds(10, 10, 770, 340);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setBounds(10, 10, 770, 340);
+
+        window.add(scrollPane);
+        window.revalidate();
+        window.repaint();
+    }
 
     public static void userWindow(JFrame window, UserChecker user) {
         window.getContentPane().removeAll();
@@ -36,7 +52,7 @@ public class GUI {
                 window.revalidate();
                 window.repaint();
                 try {
-                    user.Attendance(now);
+                    user.Attendance(formattedDateTime);
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -61,7 +77,7 @@ public class GUI {
         menuBar.add(fileMenu);
         window.setJMenuBar(menuBar);
 
-        JLabel label = new JLabel("Username:");
+        JLabel label = new JLabel("name:");
         label.setBounds(50,20,150,25);
         window.add(label);
 
@@ -86,20 +102,40 @@ public class GUI {
             public void actionPerformed(ActionEvent e) {
                 char[] pass = password.getPassword();
                 String passwordString = new String(pass);
-                try {
-                    UserChecker user = new UserChecker(username.getText(), passwordString);
-                    if (user.getId() > -1){
-                        userWindow(window, user);
-                    }
 
-                } catch (SQLException ex) {
-                    JLabel label2 = new JLabel("Wrong username or password");
-                    label2.setForeground(Color.RED);
-                    label2.setBounds(100,110,200,25);
-                    window.add(label2);
-                    window.revalidate();
-                    window.repaint();
+                if (fileMenu.getText().equals("employee")) {
+                    try {
+                        UserChecker user = new UserChecker(username.getText(), passwordString);
+                        if (user.getId() > -1){
+                            userWindow(window, user);
+                        }
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JLabel label2 = new JLabel("Wrong username or password");
+                        label2.setForeground(Color.RED);
+                        label2.setBounds(100,110,200,25);
+                        window.add(label2);
+                        window.revalidate();
+                        window.repaint();
+                    }
                 }
+
+                else {
+                    AdminData admin = new AdminData(username.getText(), passwordString);
+                    if(admin.getConnection() != null){
+                        adminWindow(window);
+                    }
+                    else {
+                        JLabel label2 = new JLabel("Wrong username or password");
+                        label2.setForeground(Color.RED);
+                        label2.setBounds(100,110,200,25);
+                        window.add(label2);
+                        window.revalidate();
+                        window.repaint();
+                    }
+                }
+
             }
         };
 

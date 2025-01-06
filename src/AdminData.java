@@ -12,6 +12,7 @@ public class AdminData {
 
             else{
                 System.out.println("Admin does not exist");
+                this.connection = null;
             }
         } catch (SQLException e) {
             System.out.println("Invalid username or password");
