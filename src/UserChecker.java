@@ -1,7 +1,9 @@
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class UserChecker {
-    int id;
+    private int id;
     private Connection connection;
 
 
@@ -29,25 +31,31 @@ public class UserChecker {
         String query = "SELECT * FROM t_emp WHERE name = '" + name + "' AND code = '" + password + "'";
         ResultSet rs = statement.executeQuery(query);
         if (rs.next()) {
-            return true; // Admin exists
+            return true;
         }
         return false;
     }
 
     public int getFirstId(String name, String password) throws SQLException {
         Statement statement = connection.createStatement();
-        // trouver l'id du frérot ////////////////////////////
-        return 1;
+        String query = "SELECT id FROM t_emp WHERE name = '" + name + "' AND code = '" + password + "'";
+        ResultSet rs = statement.executeQuery(query);
+        if (rs.next()) {
+            int id = rs.getInt("id");
+        }
+        System.out.println("First id is " + id);
+        return id;
     }
 
     public int getId(){
         return this.id;
     }
 
-    public void Attendance () throws SQLException {
-        String time = "Current time"; // entrer la date //////////////////////////////////////////////////
+    public void Attendance (LocalDateTime formattedDateTime) throws SQLException {
         Statement statement = connection.createStatement();
-        String query = "FROM t_work_time INSERT this.id "; // remplir avec le query pour la connection /////////////////////////
+        String query = "INSERT INTO t_lock_in_record (id, check_in_time) VALUES (" + id + "," + formattedDateTime + ") ";
+        System.out.println("Test insertion date");
+        // remplir avec le query pour la connection ////////////////////////////////////////////////////////////////////////////
         statement.executeUpdate(query);
     }
 }

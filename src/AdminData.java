@@ -4,7 +4,6 @@ public class AdminData {
     private Connection connection;
 
     public AdminData(String username, String password) {
-        // vérifier que l'admin existe dans le tableau prblm entre première connexion ou pas
         try {
             if (AdminExists(username, password)) {
                 System.out.println("Connection to Database Successful");
@@ -31,13 +30,13 @@ public class AdminData {
             ResultSet rs = statement.executeQuery("SELECT * FROM t_admin WHERE username = '" + username.trim() + "' AND password = '" + password.trim() + "';");
 
             if (rs.next()) {
-                return true; // Admin exist
+                return true;
             }
         } catch (SQLException e) {
             System.out.println("Error while connecting to the database: " + e.getMessage());
         }
 
-        return false; // Admin doesn't exist
+        return false;
     }
 
 

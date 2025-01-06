@@ -58,7 +58,7 @@ public class CreateDatabase {
                 CREATE TABLE IF NOT EXISTS t_emp (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     name CHAR(20) NOT NULL,
-                    code VARCHAR(36) UNIQUE NOT NULL
+                    code VARCHAR(36) NOT NULL
                 );
                 """;
 
@@ -86,6 +86,8 @@ public class CreateDatabase {
 
         String insertEmpRoot = "INSERT INTO t_emp (name, code) VALUES ('root', 'password')";
         String insertEmp2 = "INSERT INTO t_emp (name, code) VALUES ('Gabriel', 'pieds')";
+        String insertEmp3 = "INSERT INTO t_emp (name, code) VALUES ('Mathis', 'password')";
+        String insertEmp4 = "INSERT INTO t_emp (name, code) VALUES ('Aurian', 'password')";
         String insertAdminRoot = "INSERT INTO t_admin (id, username, password) VALUES (1,'root','password')";
 
         String newUser = "adminChecker";
@@ -131,6 +133,8 @@ public class CreateDatabase {
 
             statement.executeUpdate(insertEmpRoot);
             statement.executeUpdate(insertEmp2);
+            statement.executeUpdate(insertEmp3);
+            statement.executeUpdate(insertEmp4);
             System.out.println("Insertion of root and Gab as employee successfull");
 
             statement.executeUpdate(insertAdminRoot);
@@ -158,7 +162,7 @@ public class CreateDatabase {
 
         //Create admiData
         AdminData root = new AdminData("root", "password");
-        root.makeQuery("SELECT * FROM t_admin");
+        root.makeQuery("SELECT * FROM t_emp");
         UserChecker gab = new UserChecker("Gabriel", "pieds");
 
     }

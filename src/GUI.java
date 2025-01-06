@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class GUI {
+
     public static void userWindow(JFrame window, UserChecker user) {
         window.getContentPane().removeAll();
         JButton present = new JButton("attend as present");
@@ -34,14 +35,14 @@ public class GUI {
                 window.add(label2);
                 window.revalidate();
                 window.repaint();
-                insertLoginTime(user, formattedDateTime);
+                try {
+                    user.Attendance(now);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         };
         button.addActionListener(attend);
-    }
-
-    public static void insertLoginTime(UserChecker user, String formattedDateTime) {
-        System.out.println("à faire"); //Query pour login l'attendance de l'user ///////////////////////////////////////////
     }
 
     public static void main(String[] args) {
