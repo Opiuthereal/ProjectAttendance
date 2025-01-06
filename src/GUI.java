@@ -7,19 +7,47 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class GUI {
-    public static void adminWindow(JFrame window){
+    //connect the query wit h admin connection ///////////////////////////////////////////////////////////////////////
+    public static void adminWindow(JFrame window, AdminData admin){
         window.getContentPane().removeAll();
-        window.setBounds(200, 200, 800, 400);
-
+        window.setBounds(200, 200, 800, 600);
         JTextArea textArea = new JTextArea(20, 30);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
-        textArea.setBounds(10, 10, 770, 340);
+        textArea.setBounds(10, 10, 770, 270);
 
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setBounds(10, 10, 770, 340);
+        scrollPane.setBounds(10, 10, 770, 270);
 
         window.add(scrollPane);
+
+        JTextArea displayArea = new JTextArea();
+        displayArea.setEditable(false);
+        displayArea.setLineWrap(true);
+        displayArea.setWrapStyleWord(true);
+        JScrollPane displayScrollPane = new JScrollPane(displayArea);
+        displayScrollPane.setBounds(10, 305, 770, 250);
+        window.add(displayScrollPane);
+
+        JButton login = new JButton("Execute");
+        login.setBounds(10, 280, 130, 25);
+        window.add(login);
+
+        ActionListener execute = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String text = textArea.getText();
+                System.out.println("Text Area Content: \n" + text);
+
+                displayArea.setText(text);
+
+                textArea.setText("");
+
+                window.revalidate();
+                window.repaint();
+            }
+        };
+
+        login.addActionListener(execute);
         window.revalidate();
         window.repaint();
     }
@@ -124,7 +152,7 @@ public class GUI {
                 else {
                     AdminData admin = new AdminData(username.getText(), passwordString);
                     if(admin.getConnection() != null){
-                        adminWindow(window);
+                        adminWindow(window, admin);
                     }
                     else {
                         JLabel label2 = new JLabel("Wrong username or password");

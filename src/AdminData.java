@@ -42,32 +42,49 @@ public class AdminData {
 
 
 
-    public void makeQuery(String query) throws SQLException {
+    public String makeQuery(String query) throws SQLException {
         Statement statement = connection.createStatement();
-        ResultSet rs = statement.executeQuery(query);
-        ResultSetToString(rs);
+        String[] lines = query.split("\n");
+        StringBuilder res = new StringBuilder();
 
+        for (String line : lines) {
+            if (line.trim().length() >= 6 && line.trim().substring(0, 6).equalsIgnoreCase("SELECT")) {
+                ResultSet resultSet = statement.executeQuery(line);
+                res.append(ResultSetToString(resultSet));
+            }
+            else {
+                statement.executeUpdate(line);
+            }
+        }
 
+        return res.toString();
     }
 
-    public void ResultSetToString(ResultSet rs) throws SQLException {
+
+    public String ResultSetToString(ResultSet rs) throws SQLException {
         System.out.println("ResultSet: ");
 
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
+        StringBuilder result = new StringBuilder();
 
         for (int i = 1; i <= columnCount; i++) {
-            System.out.print(metaData.getColumnName(i) + "\t");
+            result.append(metaData.getColumnName(i)).append("\t");
         }
-        System.out.println();
+        result.append("\n");
 
         while (rs.next()) {
             for (int i = 1; i <= columnCount; i++) {
-                System.out.print(rs.getString(i) + "\t");
+                result.append(rs.getString(i)).append("\t");
             }
-            System.out.println();
+            result.append("\n");
         }
+
+        System.out.println(result.toString());
+
+        return result.toString();
     }
+
 
 
     public Connection getConnection() {
