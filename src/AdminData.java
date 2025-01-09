@@ -48,9 +48,10 @@ public class AdminData {
         StringBuilder res = new StringBuilder();
 
         for (String line : lines) {
-            if (line.trim().length() >= 6 && line.trim().substring(0, 6).equalsIgnoreCase("SELECT")) {
+            if (line.trim().length() >= 0 && line.trim().substring(0, 6).equalsIgnoreCase("SELECT")) {
                 ResultSet resultSet = statement.executeQuery(line);
                 res.append(ResultSetToString(resultSet));
+                res.append("\n");
             }
             else {
                 statement.executeUpdate(line);

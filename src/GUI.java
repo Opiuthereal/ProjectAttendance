@@ -7,8 +7,57 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class GUI {
-    //connect the query wit h admin connection ///////////////////////////////////////////////////////////////////////
-    public static void adminWindow(JFrame window, AdminData admin){
+    private static JFrame window = new JFrame();
+
+    public void mainWindow() {
+        window.getContentPane().removeAll();
+        window.setBounds(200, 200, 400, 200);
+        window.setLayout(null);
+
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("employee");
+        JMenuItem it1 = new JMenuItem("employee");
+        JMenuItem it2 = new JMenuItem("admin");
+        JMenuItem it3 = new JMenuItem("disconnect");
+
+        fileMenu.add(it1);
+        fileMenu.add(it2);
+        fileMenu.add(it3);
+        menuBar.add(fileMenu);
+        window.setJMenuBar(menuBar);
+
+        JLabel label = new JLabel("name:");
+        label.setBounds(50, 20, 150, 25);
+        window.add(label);
+
+        JTextField username = new JTextField(20);
+        username.setBounds(200, 20, 130, 25);
+        window.add(username);
+
+        JLabel label2 = new JLabel("Password:");
+        label2.setBounds(50, 50, 150, 20);
+        window.add(label2);
+
+        JPasswordField password = new JPasswordField(20);
+        password.setBounds(200, 50, 130, 25);
+        window.add(password);
+
+        JButton login = new JButton("Login");
+        login.setBounds(130, 80, 130, 25);
+        window.add(login);
+
+        actionListenLogin(password, fileMenu, username, login);
+        actionListenItem1(fileMenu, label, it1);
+        actionListenItem2(fileMenu, label, it2);
+        actionListenItem3(it3);
+
+        window.setVisible(true);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setResizable(true);
+    }
+
+    public void adminWindow(AdminData admin) {
         window.getContentPane().removeAll();
         window.setBounds(200, 200, 800, 600);
         JTextArea textArea = new JTextArea(20, 30);
@@ -33,14 +82,24 @@ public class GUI {
         login.setBounds(10, 280, 130, 25);
         window.add(login);
 
+        ActionListenTerminal(textArea, admin, displayArea, login);
+
+        window.revalidate();
+        window.repaint();
+    }
+
+    public void ActionListenTerminal(JTextArea textArea, AdminData admin, JTextArea displayArea, JButton login) {
         ActionListener execute = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String text = textArea.getText();
                 System.out.println("Text Area Content: \n" + text);
-
-                displayArea.setText(text);
-
-                textArea.setText("");
+                try {
+                    String res = admin.makeQuery(text);
+                    displayArea.setText(res);
+                } catch (SQLException ex) {
+                    displayArea.setText(ex.getMessage());
+                    throw new RuntimeException(ex);
+                }
 
                 window.revalidate();
                 window.repaint();
@@ -48,16 +107,55 @@ public class GUI {
         };
 
         login.addActionListener(execute);
-        window.revalidate();
-        window.repaint();
     }
 
-    public static void userWindow(JFrame window, UserChecker user) {
+    public void actionListenLogin(JPasswordField password, JMenu fileMenu, JTextField username, JButton login) {
+        ActionListener loging = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                char[] pass = password.getPassword();
+                String passwordString = new String(pass);
+
+                if (fileMenu.getText().equals("employee")) {
+                    try {
+                        UserChecker user = new UserChecker(username.getText().trim(), passwordString);
+                        if (user.getId() > -1) {
+                            userWindow(user);
+                        }
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JLabel label2 = new JLabel("Wrong username or password");
+                        label2.setForeground(Color.RED);
+                        label2.setBounds(100, 110, 200, 25);
+                        window.add(label2);
+                        window.revalidate();
+                        window.repaint();
+                    }
+                } else {
+                    AdminData admin = new AdminData(username.getText().trim(), passwordString);
+                    if (admin.getConnection() != null) {
+                        adminWindow(admin);
+                    } else {
+                        JLabel label2 = new JLabel("Wrong username or password");
+                        label2.setForeground(Color.RED);
+                        label2.setBounds(100, 110, 200, 25);
+                        window.add(label2);
+                        window.revalidate();
+                        window.repaint();
+                    }
+                }
+
+            }
+        };
+        login.addActionListener(loging);
+    }
+
+    public void userWindow(UserChecker user) {
         window.getContentPane().removeAll();
         JButton present = new JButton("attend as present");
-        present.setBounds(90,30,200,25);
+        present.setBounds(90, 30, 200, 25);
 
-        eventAttend(window, present, user);
+        actionListenAttend(present, user);
 
         window.add(present);
         window.revalidate();
@@ -65,7 +163,7 @@ public class GUI {
         System.out.println("déclanché");
     }
 
-    public static void eventAttend(JFrame window, JButton button, UserChecker user) {
+    public void actionListenAttend(JButton button, UserChecker user) {
         ActionListener attend = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 LocalDateTime now = LocalDateTime.now();
@@ -74,7 +172,7 @@ public class GUI {
                 String formattedDateTime = now.format(formatter);
 
                 JLabel label2 = new JLabel("Login: " + formattedDateTime);
-                label2.setBounds(110,80,200,25);
+                label2.setBounds(110, 80, 200, 25);
 
                 window.add(label2);
                 window.revalidate();
@@ -89,104 +187,37 @@ public class GUI {
         button.addActionListener(attend);
     }
 
-    public static void main(String[] args) {
-        JFrame window = new JFrame("Attendance system");
-        window.setBounds(200, 200, 400, 200);
-        window.setLayout(null);
-
-
-        JMenuBar menuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("employee");
-        JMenuItem it1 = new JMenuItem("employee");
-        JMenuItem it2 = new JMenuItem("admin");
-
-        fileMenu.add(it1);
-        fileMenu.add(it2);
-        menuBar.add(fileMenu);
-        window.setJMenuBar(menuBar);
-
-        JLabel label = new JLabel("name:");
-        label.setBounds(50,20,150,25);
-        window.add(label);
-
-        JTextField username = new JTextField(20);
-        username.setBounds(200,20,130,25);
-        window.add(username);
-
-        JLabel label2 = new JLabel("Password:");
-        label2.setBounds(50,50,150,20);
-        window.add(label2);
-
-        JPasswordField password = new JPasswordField(20);
-        password.setBounds(200,50,130,25);
-        window.add(password);
-
-        JButton login = new JButton("Login");
-        login.setBounds(130,80,130,25);
-        window.add(login);
-
-
-        ActionListener loging = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                char[] pass = password.getPassword();
-                String passwordString = new String(pass);
-
-                if (fileMenu.getText().equals("employee")) {
-                    try {
-                        UserChecker user = new UserChecker(username.getText(), passwordString);
-                        if (user.getId() > -1){
-                            userWindow(window, user);
-                        }
-
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JLabel label2 = new JLabel("Wrong username or password");
-                        label2.setForeground(Color.RED);
-                        label2.setBounds(100,110,200,25);
-                        window.add(label2);
-                        window.revalidate();
-                        window.repaint();
-                    }
-                }
-
-                else {
-                    AdminData admin = new AdminData(username.getText(), passwordString);
-                    if(admin.getConnection() != null){
-                        adminWindow(window, admin);
-                    }
-                    else {
-                        JLabel label2 = new JLabel("Wrong username or password");
-                        label2.setForeground(Color.RED);
-                        label2.setBounds(100,110,200,25);
-                        window.add(label2);
-                        window.revalidate();
-                        window.repaint();
-                    }
-                }
-
-            }
-        };
-
+    public void actionListenItem1(JMenu fileMenu, JLabel label,  JMenuItem it1){
         ActionListener item1 = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 fileMenu.setText("employee");
                 label.setText("name:");
             }
         };
+        it1.addActionListener(item1);
+    }
 
+    public void actionListenItem2(JMenu fileMenu, JLabel label, JMenuItem it2){
         ActionListener item2 = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 fileMenu.setText("admin");
                 label.setText("username:");
             }
         };
-
-        login.addActionListener(loging);
-        it1.addActionListener(item1);
         it2.addActionListener(item2);
+    }
+    private void actionListenItem3(JMenuItem it3) {
+        ActionListener item3 = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mainWindow();
+            }
+        };
+        it3.addActionListener(item3);
+    }
 
-        window.setVisible(true);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setResizable(true);
+    public static void main(String[] args) {
+        GUI gui = new GUI();
+        gui.mainWindow();
     }
 }
+
